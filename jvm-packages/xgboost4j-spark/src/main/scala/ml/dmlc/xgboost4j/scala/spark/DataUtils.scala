@@ -23,10 +23,7 @@ import ml.dmlc.xgboost4j.LabeledPoint
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.types.DataType
-import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types._
 
 object DataUtils extends Serializable {
   implicit def fromSparkPointsToXGBoostPointsJava(sps: Iterator[SparkLabeledPoint])
