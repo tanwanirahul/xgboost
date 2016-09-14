@@ -13,8 +13,7 @@ In R-package, you can use .(dot) to replace under score in the parameters, for e
 General Parameters
 ------------------
 * booster [default=gbtree]
-  - which booster to use, can be gbtree, gblinear or dart.
-  　gbtree and dart use tree based model while gblinear uses linear function.
+  - which booster to use, can be gbtree, gblinear or dart. gbtree and dart use tree based model while gblinear uses linear function.
 * silent [default=0]
   - 0 means printing running messages, 1 means silent mode.
 * nthread [default to maximum number of threads available if not set]
@@ -81,20 +80,20 @@ Additional parameters for Dart Booster
   - type of sampling algorithm.
     - "uniform": dropped trees are selected uniformly.
     - "weighted": dropped trees are selected in proportion to weight.
-* normalize_type [default="tree]
+* normalize_type [default="tree"]
   - type of normalization algorithm.
-    - "tree": New trees have the same weight of each of dropped trees.
-              weight of new trees are 1 / (k + learnig_rate)
-              dropped trees are scaled by a factor of k / (k + learning_rate)
-    - "forest": New trees have the same weight of sum of dropped trees (forest).
-                weight of new trees are 1 / (1 + learning_rate)
-                dropped trees are scaled by a factor of 1 / (1 + learning_rate)
+    - "tree": new trees have the same weight of each of dropped trees.
+      - weight of new trees are 1 / (k + learnig_rate)
+      - dropped trees are scaled by a factor of k / (k + learning_rate)
+    - "forest": new trees have the same weight of sum of dropped trees (forest).
+      - weight of new trees are 1 / (1 + learning_rate)
+      - dropped trees are scaled by a factor of 1 / (1 + learning_rate)
 * rate_drop [default=0.0]
   - dropout rate.
   - range: [0.0, 1.0]
 * skip_drop [default=0.0]
   - probability of skip dropout.
-    If a dropout is skipped, new trees are added in the same manner as gbtree.
+    - If a dropout is skipped, new trees are added in the same manner as gbtree.
   - range: [0.0, 1.0]
 
 Parameters for Linear Booster
@@ -119,6 +118,7 @@ Specify the learning task and the corresponding learning objective. The objectiv
  - "multi:softmax" --set XGBoost to do multiclass classification using the softmax objective, you also need to set num_class(number of classes)
  - "multi:softprob" --same as softmax, but output a vector of ndata * nclass, which can be further reshaped to ndata, nclass matrix. The result contains predicted probability of each data point belonging to each class.
  - "rank:pairwise" --set XGBoost to do ranking task by minimizing the pairwise loss
+ - "reg:gamma" --gamma regression for severity data, output mean of gamma distribution
 * base_score [ default=0.5 ]
   - the initial prediction score of all instances, global bias
   - for sufficent number of iterations, changing this value will not have too much effect.
@@ -138,6 +138,7 @@ Specify the learning task and the corresponding learning objective. The objectiv
   - "ndcg@n","map@n": n can be assigned as an integer to cut off the top positions in the lists for evaluation.
   - "ndcg-","map-","ndcg@n-","map@n-": In XGBoost, NDCG and MAP will evaluate the score of a list without any positive samples as 1. By adding "-" in the evaluation metric XGBoost will evaluate these score as 0 to be consistent under some conditions.
 training repeatively
+  - "gamma-deviance": [residual deviance for gamma regression]
 * seed [ default=0 ]
  - random number seed.
 

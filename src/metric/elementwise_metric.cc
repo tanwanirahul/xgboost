@@ -135,6 +135,34 @@ struct EvalPoissionNegLogLik : public EvalEWiseBase<EvalPoissionNegLogLik> {
   }
 };
 
+struct EvalGammaDeviance : public EvalEWiseBase<EvalGammaDeviance> {
+  const char *Name() const override {
+    return "gamma-deviance";
+  }
+  inline float EvalRow(float label, float pred) const {
+    float epsilon = 1.0e-9;
+    float tmp = label / (pred + epsilon);
+    return tmp - std::log(tmp) - 1;
+  }
+  inline static float GetFinal(float esum, float wsum) {
+    return 2 * esum;
+  }
+};
+
+struct EvalGammaNLogLik: public EvalEWiseBase<EvalGammaNLogLik> {
+  const char *Name() const override {
+    return "gamma-nloglik";
+  }
+  inline float EvalRow(float y, float py) const {
+    float psi = 1.0;
+    float theta = -1. / py;
+    float a = psi;
+    float b = -std::log(-theta);
+    float c = 1. / psi * std::log(y/psi) - std::log(y) - common::LogGamma(1. / psi);
+    return -((y * theta - b) / a + c);
+  }
+};
+
 XGBOOST_REGISTER_METRIC(RMSE, "rmse")
 .describe("Rooted mean square error.")
 .set_body([](const char* param) { return new EvalRMSE(); });
@@ -154,6 +182,14 @@ XGBOOST_REGISTER_METRIC(Error, "error")
 XGBOOST_REGISTER_METRIC(PossionNegLoglik, "poisson-nloglik")
 .describe("Negative loglikelihood for poisson regression.")
 .set_body([](const char* param) { return new EvalPoissionNegLogLik(); });
+
+XGBOOST_REGISTER_METRIC(GammaDeviance, "gamma-deviance")
+.describe("Residual deviance for gamma regression.")
+.set_body([](const char* param) { return new EvalGammaDeviance(); });
+
+XGBOOST_REGISTER_METRIC(GammaNLogLik, "gamma-nloglik")
+.describe("Negative log-likelihood for gamma regression.")
+.set_body([](const char* param) { return new EvalGammaNLogLik(); });
 
 }  // namespace metric
 }  // namespace xgboost
