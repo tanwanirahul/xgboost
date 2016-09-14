@@ -17,11 +17,13 @@
 package ml.dmlc.xgboost4j.scala.spark
 
 import scala.collection.JavaConverters._
-
 import org.apache.spark.mllib.linalg.{SparseVector, DenseVector, Vector}
 import org.apache.spark.mllib.regression.{LabeledPoint => SparkLabeledPoint}
-
 import ml.dmlc.xgboost4j.LabeledPoint
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types._
 
 object DataUtils extends Serializable {
   implicit def fromSparkPointsToXGBoostPointsJava(sps: Iterator[SparkLabeledPoint])
@@ -57,5 +59,22 @@ object DataUtils extends Serializable {
             sparseFeature.values.map(_.toFloat))
       }
     }
+  }
+
+  implicit def dataframeToLabledPoints(dataset: DataFrame, labelColumn: String = "label",
+    featuresColumn: String = "features"): RDD[SparkLabeledPoint] = {
+      dataset.select(labelColumn, featuresColumn).rdd map { row =>
+        new SparkLabeledPoint(row.getDouble(0), row.getAs[Vector](1))}
+  }
+
+  def appendOutput(df: DataFrame, colName: String, colType: DataType,
+      values: RDD[Array[Array[Float]]]): DataFrame = {
+
+    val dfRDD = df.rdd.zipWithIndex() map {x => (x._2, x._1) }
+    val dataRDD = values.zipWithIndex() map {x => (x._2, x._1) }
+    val rows = dfRDD.join(dataRDD) map { case(id, (row, value)) =>
+      Row.fromSeq(row.toSeq :+ value)}
+    df.sqlContext.createDataFrame(rows, StructType(
+      df.schema.fields :+ StructField(colName, colType, true)))
   }
 }
