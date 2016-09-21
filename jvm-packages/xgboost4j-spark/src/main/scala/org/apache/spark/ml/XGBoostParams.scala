@@ -22,6 +22,7 @@ import org.apache.spark.sql.types.StructField
 import org.apache.spark.mllib.linalg.VectorUDT
 import org.apache.spark.ml.util.SchemaUtils
 import org.apache.spark.sql.types.DoubleType
+import scala.collection.mutable.HashMap
 
 object XGBoostParams {
 
@@ -292,30 +293,8 @@ trait XGBoostParams extends PredictorParams {
    */
   def paramsMap: Map[String, Any] = {
 
-    Map(
-      booster.name -> $(booster),
-      silent.name -> $(silent),
-      eta.name -> $(eta),
-      gamma.name -> $(gamma),
-      maxDepth.name -> $(maxDepth),
-      numClasses.name -> $(numClasses),
-      minChildWeight.name -> $(minChildWeight),
-      maxDeltaStep.name -> $(maxDeltaStep),
-      subsample.name -> $(subsample),
-      colsampleByTree.name -> $(colsampleByTree),
-      colsampleByLevel.name -> $(colsampleByLevel),
-      lambda.name -> $(lambda),
-      alpha.name -> $(alpha),
-      treeMethod.name -> $(treeMethod),
-      sketchEPS.name -> $(sketchEPS),
-      scalePOSWeight.name -> $(scalePOSWeight),
-      sampleType.name -> $(sampleType),
-      normalizeType.name -> $(normalizeType),
-      rateDrop.name -> $(rateDrop),
-      skipDrop.name -> $(skipDrop),
-      lambdaBias.name -> $(lambdaBias),
-      objective.name -> $(objective),
-      baseScore.name -> $(baseScore),
-      seed.name -> $(seed))
+      val definedParams = new HashMap[String, Any]()
+      params.foreach { x => if (isSet(x)) definedParams += (x.name -> $(x)) }
+      definedParams.toMap
   }
 }

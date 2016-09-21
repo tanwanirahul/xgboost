@@ -193,6 +193,12 @@ object XGBoost extends Serializable {
     require(nWorkers > 0, "you must specify more than 0 workers")
     val tracker = new RabitTracker(nWorkers)
     implicit val sc = trainingData.sparkContext
+    println(s"\n\nTraining data count: ${trainingData.count()}")
+    val labels = trainingData.map(labelPoint => labelPoint.label)
+    println(s"\n\n Training data labels: ${labels.count()} and unique values:" +
+      s"${labels.groupBy { x => x }.count()}")
+    println(s"configMap: ${configMap}, round: ${round}, nWorkers: ${nWorkers}, obj: ${obj}," +
+      s"eval: ${eval}, useExM: ${useExternalMemory}, missing: ${missing}")
     var overridedConfMap = configMap
     if (overridedConfMap.contains("nthread")) {
       val nThread = overridedConfMap("nthread").toString.toInt
