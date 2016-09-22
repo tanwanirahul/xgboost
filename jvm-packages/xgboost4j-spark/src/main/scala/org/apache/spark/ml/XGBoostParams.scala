@@ -53,7 +53,7 @@ trait XGBoostParams extends PredictorParams {
   final val useExternalMemory: BooleanParam = new BooleanParam(this, "use_external_memory",
     s"Flag to indicate whether to use external cache for training and predictions.")
 
-  final val booster: Param[String] = new Param[String](this, "booster",
+  final val boosterType: Param[String] = new Param[String](this, "booster",
     s"Booster to use ${XGBoostParams.supportedBoosters.mkString(", ")}.",
     (value: String) => XGBoostParams.supportedBoosters.contains(value.toLowerCase))
 
@@ -157,7 +157,7 @@ trait XGBoostParams extends PredictorParams {
   final val seed: IntParam = new IntParam(this, "seed",
     "Random number seed.")
 
-  setDefault(booster -> "gbtree", silent -> 0, eta -> 0.3,
+  setDefault(boosterType -> "gbtree", silent -> 0, eta -> 0.3,
     gamma -> 0, maxDepth -> 6, minChildWeight -> 1, maxDeltaStep -> 0,
     subsample -> 1, colsampleByTree -> 1, colsampleByLevel -> 1,
     lambda -> 1, alpha -> 0, treeMethod -> "auto", sketchEPS -> 0.03,
@@ -169,9 +169,9 @@ trait XGBoostParams extends PredictorParams {
 
   final def getUseExternalMemory(): Boolean = $(useExternalMemory)
 
-  def setBooster(value: String): this.type = set(booster, value)
+  def setBoosterType(value: String): this.type = set(boosterType, value)
 
-  final def getBooster: String = $(booster).toLowerCase()
+  final def getBoosterType: String = $(boosterType).toLowerCase()
 
   def setRounds(value: Int): this.type = set(rounds, value)
 
