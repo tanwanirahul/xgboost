@@ -33,12 +33,14 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row}
 import org.apache.spark.{SparkContext, TaskContext}
 import org.apache.spark.ml.XGBoostParams
 
-class XGBoostModel(_booster: Booster) extends Model[XGBoostModel] with Serializable
-  with XGBoostParams {
+class XGBoostModel(override val uid: String, _booster: Booster) extends Model[XGBoostModel]
+  with Serializable  with XGBoostParams {
 
   var inputCol = $(featuresCol)
   var outputCol = $(predictionCol)
   var outputType: DataType = ArrayType(elementType = FloatType, containsNull = false)
+
+  def this(_booster: Booster) = this(Identifiable.randomUID("XGBoostModel"), _booster)
 
   /**
    * evaluate XGBoostModel with a RDD-wrapped dataset
@@ -180,8 +182,6 @@ class XGBoostModel(_booster: Booster) extends Model[XGBoostModel] with Serializa
   }
 
   def booster: Booster = _booster
-
-  override val uid: String = Identifiable.randomUID("XGBoostModel")
 
   override def copy(extra: ParamMap): XGBoostModel = {
     defaultCopy(extra)
